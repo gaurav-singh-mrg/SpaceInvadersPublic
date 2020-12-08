@@ -141,25 +141,26 @@ class SpaceShip:
 
 
 class Enemy(SpaceShip):
-    def __init__(self, Name, ImageName, Angle = 90 ,Pos = ((int(height - 100)), int(width - 200)) , AutoRotation = False):
+    def __init__(self, Name= None, ImageName=Level1Bullet, Angle=90, Pos=((int(height - 100)), int(width - 200)),
+                 AutoRotation=False):
         super().__init__(Name)
         self.ImageName = ImageName
         self.Angle = Angle
         self.Pos = Pos
         self.AutoRotation = AutoRotation
 
-    def Rotation(self):
-        OriginalPos = self.pos
-        #pos = ((int(height - 100)), int(width - 200))
-        screen_rect = self.ImageName.get_rect()
+    def Rotation(self ,angle):
+        OriginalPos = self.Pos
+        # pos = ((int(height - 100)), int(width - 200))
+        image1 = pygame.image.load("SpaceShip6.png")
+        #image = self.ImageName
+        screen_rect = image1.get_rect()
         screen_rect.center = OriginalPos
-        image = self.ImageName.copy()
-        image_rect = Level1SpaceShip.get_rect(center=screen_rect.center)
-        #
-        image = pygame.transform.rotate(self.ImageName, self.Angle)
-        image_rect = image.get_rect(center=image_rect.center)
-        screen.blit(image, image_rect)
-
+        image = image1.copy()
+        image_rect = image1.get_rect(center=screen_rect.center)
+        image1 = pygame.transform.rotate(image1, angle)
+        image_rect = image1.get_rect(center=image_rect.center)
+        screen.blit(image1, image_rect)
 
 
 LocX = 600
@@ -249,12 +250,17 @@ def OnScreenText():
 ScreenNumber = 1
 menuitm = 1
 GenerateEnemyBulk(0, 5)
+RotatedImage = Enemy()
+Angle = 0
 while isRunning:
     if i >= len(EnemyList):
         i = 0
     screen.fill((100, 0, 0))
     screen.blit(background, (0, 0))
     if ScreenNumber == 1:
+        Angle = Angle % 360
+        Angle+=5
+        RotatedImage.Rotation(Angle)
         image = pygame.transform.rotate(Level1SpaceShip, angle)
         image_rect = image.get_rect(center=image_rect.center)
         screen.blit(image, image_rect)
