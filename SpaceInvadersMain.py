@@ -62,10 +62,10 @@ score = 0
 angle = 0
 
 
-class RotateImage :
-    def __init__(self, Name, X,Y , Angle) :
+class RotateImage:
+    def __init__(self, Name, X, Y, Angle):
         self.Name = Name
-        self.Pos = (X,Y)
+        self.Pos = (X, Y)
         pos = (500, 200)
         screen_rect = Level1SpaceShip.get_rect()
         screen_rect.center = pos
@@ -73,9 +73,9 @@ class RotateImage :
         image_rect = Level1SpaceShip.get_rect(center=screen_rect.center)
 
 
-class SpaceShip :
+class SpaceShip:
     def __init__(self, Name, Damage=5, FireModeAuto=True, Rotate=False, Speed=10,
-                 Teleportation=False, x=0, y=0, EnemyMoveRight=True, MoveLeftRight=False, MoveUpDown=False) :
+                 Teleportation=False, x=0, y=0, EnemyMoveRight=True, MoveLeftRight=False, MoveUpDown=False):
         self.MoveUpDown = MoveUpDown
         self.MoveLeftRight = MoveLeftRight
         self.Name = Name
@@ -88,56 +88,78 @@ class SpaceShip :
         self.x = x
         self.y = y
 
-    def telePortation(self) :
-        if self.Teleportation :
+    def telePortation(self):
+        if self.Teleportation:
             self.x = random.randint(0, 740)
             self.y = random.randint(0, 290)
 
-    def Draw(self) :
+    def Draw(self):
         screen.blit(self.Name, (self.x, self.y))
 
-    def AutoMove(self) :
+    def AutoMove(self):
         pass
 
-    def MoveRight(self) :
+    def MoveRight(self):
         self.x += self.Speed
-        if self.x > 730 :
+        if self.x > 730:
             self.x = 730
 
-    def MoveLeft(self) :
+    def MoveLeft(self):
         self.x -= self.Speed
         print(self.x)
-        if self.x < 0 :
+        if self.x < 0:
             self.x = 0
 
-    def MoveUp(self) :
+    def MoveUp(self):
         self.y -= self.Speed
         print(self.y)
-        if self.y < 0 :
+        if self.y < 0:
             self.y = 0
 
-    def MoveDown(self) :
+    def MoveDown(self):
         self.y += self.Speed
         print(self.y)
-        if self.y > 530 :
+        if self.y > 530:
             self.y = 530
 
-    def Bullets(self, name, a, b, type='Spaceship') :
+    def Bullets(self, name, a, b, type='Spaceship'):
         global score
         self.name = name
         self.type = type
         global BulletFire
         screen.blit(self.name, (a, b))
-        for obj in EnemyList :
-            if obj.x - 26 < a < obj.x + 26 and obj.y - 26 <= b <= obj.y + 26 :
+        for obj in EnemyList:
+            if obj.x - 26 < a < obj.x + 26 and obj.y - 26 <= b <= obj.y + 26:
                 obj.Damage -= 1
                 BulletFire = False
                 screen.blit(Level1Fire, (a, b))
                 # pygame.time.wait(130)
-                if obj.Damage == 0 :
+                if obj.Damage == 0:
                     score += 1
                     screen.blit(Level1Fire, (a, b))
                     EnemyList.remove(obj)
+
+
+class Enemy(SpaceShip):
+    def __init__(self, Name, ImageName, Angle = 90 ,Pos = ((int(height - 100)), int(width - 200)) , AutoRotation = False):
+        super().__init__(Name)
+        self.ImageName = ImageName
+        self.Angle = Angle
+        self.Pos = Pos
+        self.AutoRotation = AutoRotation
+
+    def Rotation(self):
+        OriginalPos = self.pos
+        #pos = ((int(height - 100)), int(width - 200))
+        screen_rect = self.ImageName.get_rect()
+        screen_rect.center = OriginalPos
+        image = self.ImageName.copy()
+        image_rect = Level1SpaceShip.get_rect(center=screen_rect.center)
+        #
+        image = pygame.transform.rotate(self.ImageName, self.Angle)
+        image_rect = image.get_rect(center=image_rect.center)
+        screen.blit(image, image_rect)
+
 
 
 LocX = 600
@@ -160,24 +182,24 @@ LocY = 530
 EnemyList = []
 
 
-def GenerateEnemyBulk(level=0, number=5) :
-    if level == 0 :
-        for i in range(number) :
+def GenerateEnemyBulk(level=0, number=5):
+    if level == 0:
+        for i in range(number):
             EnemyList.append(SpaceShip(Name=Level1Enemy, Damage=1 * Multiplier, Speed=5, x=random.randint(0, 740),
                                        y=random.randint(0, 290)))
-    if level == 1 :
-        for i in range(number) :
+    if level == 1:
+        for i in range(number):
             EnemyList.append(SpaceShip(Name=Level2Enemy, MoveLeftRight=True, Damage=2 * Multiplier, Speed=10,
                                        x=random.randint(0, 740),
                                        y=random.randint(0, 290)))
-    if level == 2 :
-        for i in range(number) :
+    if level == 2:
+        for i in range(number):
             EnemyList.append(
                 SpaceShip(Name=Level3Enemy, Damage=3 * Multiplier, MoveUpDown=True, Speed=15, x=random.randint(0, 740),
                           y=random.randint(0, 290)))
 
-    if level == 3 :
-        for i in range(number) :
+    if level == 3:
+        for i in range(number):
             EnemyList.append(
                 SpaceShip(Name=Level4Enemy, MoveLeftRight=True, MoveUpDown=True, Damage=4 * Multiplier, Speed=20,
                           x=random.randint(0, 740),
@@ -207,7 +229,7 @@ image = Level1SpaceShip.copy()
 image_rect = Level1SpaceShip.get_rect(center=screen_rect.center)
 
 
-def OnScreenText() :
+def OnScreenText():
     # Score TExt
     Scoretext = font.render('Score: ' + str(score), True, green)
     ScoretextRect = Scoretext.get_rect()
@@ -227,143 +249,143 @@ def OnScreenText() :
 ScreenNumber = 1
 menuitm = 1
 GenerateEnemyBulk(0, 5)
-while isRunning :
-    if i >= len(EnemyList) :
+while isRunning:
+    if i >= len(EnemyList):
         i = 0
     screen.fill((100, 0, 0))
     screen.blit(background, (0, 0))
-    if ScreenNumber == 1 :
+    if ScreenNumber == 1:
         image = pygame.transform.rotate(Level1SpaceShip, angle)
         image_rect = image.get_rect(center=image_rect.center)
         screen.blit(image, image_rect)
         angle += 1
-        if menuitm == 1 :
+        if menuitm == 1:
             screen.blit(PlayC, (100, 100))
-        else :
+        else:
             screen.blit(Play, (100, 100))
-        if menuitm == 2 :
+        if menuitm == 2:
             screen.blit(SettingsC, (100, 200))
-        else :
+        else:
             screen.blit(Settings, (100, 200))
-        if menuitm == 3 :
+        if menuitm == 3:
             screen.blit(AboutC, (100, 300))
-        else :
+        else:
             screen.blit(About, (100, 300))
-        if menuitm == 4 :
+        if menuitm == 4:
             pass
             # screen.blit(ResumeC, (100, 400))
-        else :
+        else:
             pass
             # screen.blit(Resume, (100, 400))
 
-    if ScreenNumber == 2 :
+    if ScreenNumber == 2:
         SpaceShipList[spceshipindex].Draw()
         OnScreenText()
 
         # generateEnemy()
-        if len(EnemyList) == 0 :
+        if len(EnemyList) == 0:
             Level += 1
-            if Level == 0 :
+            if Level == 0:
                 GenerateEnemyBulk(0, 5)
-            if Level == 1 :
+            if Level == 1:
                 GenerateEnemyBulk(1, 4)
-            if Level == 2 :
+            if Level == 2:
                 GenerateEnemyBulk(2, 3)
-            if Level == 3 :
+            if Level == 3:
                 GenerateEnemyBulk(3, 2)
 
-        for obj in EnemyList :
+        for obj in EnemyList:
             # obj.telePortation()
             obj.Draw()
-            if obj.MoveLeftRight :
-                if obj.x < 740 and obj.EnemyMoveRight is True :
+            if obj.MoveLeftRight:
+                if obj.x < 740 and obj.EnemyMoveRight is True:
                     obj.x += 1
-                elif obj.x == 740 :
+                elif obj.x == 740:
                     obj.y += 10
                     obj.x = 739
                     obj.EnemyMoveRight = False
-                elif obj.x > 0 and obj.EnemyMoveRight is False :
+                elif obj.x > 0 and obj.EnemyMoveRight is False:
                     obj.x -= 1
-                elif obj.x <= 0 :
+                elif obj.x <= 0:
                     obj.y += 10
                     obj.EnemyMoveRight = True
-            if obj.MoveUpDown :
-                if obj.y < 340 and obj.EnemyMoveRight is True :
+            if obj.MoveUpDown:
+                if obj.y < 340 and obj.EnemyMoveRight is True:
                     obj.y += 1
-                elif obj.y == 340 :
+                elif obj.y == 340:
                     obj.x += 10
                     obj.y = 339
                     obj.EnemyMoveRight = False
-                elif obj.y > 0 and obj.EnemyMoveRight is False :
+                elif obj.y > 0 and obj.EnemyMoveRight is False:
                     obj.y -= 1
-                elif obj.y <= 0 :
+                elif obj.y <= 0:
                     obj.x += 10
                     obj.EnemyMoveRight = True
-            if MoveCross :
+            if MoveCross:
                 pass
 
-    for event in pygame.event.get() :
-        if event.type == pygame.QUIT :
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
             isRunning = False
-        if event.type == pygame.KEYDOWN :
-            if event.key == pygame.K_LEFT :
-                if ScreenNumber == 1 :
-                    if menuitm == 1 :
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                if ScreenNumber == 1:
+                    if menuitm == 1:
                         menuitm = 2
-                    elif menuitm == 2 :
+                    elif menuitm == 2:
                         menuitm = 3
-                    elif menuitm == 3 :
+                    elif menuitm == 3:
                         menuitm = 4
-                    elif menuitm == 4 :
+                    elif menuitm == 4:
                         menuitm = 1
-                elif ScreenNumber == 2 :
+                elif ScreenNumber == 2:
                     KeyPressType = "Left"
                     SpaceShipList[spceshipindex].MoveLeft()
             if event.key == pygame.K_RIGHT:
-                if ScreenNumber == 1 :
-                    if menuitm == 1 :
+                if ScreenNumber == 1:
+                    if menuitm == 1:
                         menuitm = 4
-                    elif menuitm == 2 :
+                    elif menuitm == 2:
                         menuitm = 1
-                    elif menuitm == 3 :
+                    elif menuitm == 3:
                         menuitm = 2
-                    elif menuitm == 4 :
+                    elif menuitm == 4:
                         menuitm = 3
-                elif ScreenNumber == 2 :
+                elif ScreenNumber == 2:
                     KeyPressType = "Right"
                     SpaceShipList[spceshipindex].MoveRight()
-            if event.key == pygame.K_UP :
-                if ScreenNumber == 1 :
-                    if menuitm == 1 :
+            if event.key == pygame.K_UP:
+                if ScreenNumber == 1:
+                    if menuitm == 1:
                         menuitm = 4
-                    elif menuitm == 2 :
+                    elif menuitm == 2:
                         menuitm = 1
-                    elif menuitm == 3 :
+                    elif menuitm == 3:
                         menuitm = 2
-                    elif menuitm == 4 :
+                    elif menuitm == 4:
                         menuitm = 3
-                elif ScreenNumber == 2 :
+                elif ScreenNumber == 2:
                     KeyPressType = "Up"
                     SpaceShipList[spceshipindex].MoveUp()
-            if event.key == pygame.K_DOWN :
-                if ScreenNumber == 1 :
-                    if menuitm == 1 :
+            if event.key == pygame.K_DOWN:
+                if ScreenNumber == 1:
+                    if menuitm == 1:
                         menuitm = 2
-                    elif menuitm == 2 :
+                    elif menuitm == 2:
                         menuitm = 3
-                    elif menuitm == 3 :
+                    elif menuitm == 3:
                         menuitm = 4
-                    elif menuitm == 4 :
+                    elif menuitm == 4:
                         menuitm = 1
-                elif ScreenNumber == 2 :
+                elif ScreenNumber == 2:
                     KeyPressType = "Down"
                     SpaceShipList[spceshipindex].MoveDown()
-            if event.key == pygame.K_RETURN :
-                if ScreenNumber == 1 :
+            if event.key == pygame.K_RETURN:
+                if ScreenNumber == 1:
                     ScreenNumber = 2
-                elif ScreenNumber == 2 :
+                elif ScreenNumber == 2:
                     ScreenNumber == 1
-            if event.key == pygame.K_SPACE and not BulletFire :
+            if event.key == pygame.K_SPACE and not BulletFire:
                 KeyPressType = "Bullet"
                 bulletx = SpaceShipList[spceshipindex].x
                 bullety = SpaceShipList[spceshipindex].y
@@ -371,26 +393,26 @@ while isRunning :
                 SpaceShipList[spceshipindex].Bullets(Level1Bullet, bulletx, bullety)
 
             KeyPress = True
-        if event.type == pygame.KEYUP :
+        if event.type == pygame.KEYUP:
             KeyPressType = None
             KeyPress = False
 
         # enemy(EnemyX, EnemyY)
 
         # Ship Movement Continuous
-    if KeyPress :
-        if KeyPressType == "Up" :
+    if KeyPress:
+        if KeyPressType == "Up":
             SpaceShipList[spceshipindex].MoveUp()
-        if KeyPressType == "Down" :
+        if KeyPressType == "Down":
             SpaceShipList[spceshipindex].MoveDown()
-        if KeyPressType == "Left" :
+        if KeyPressType == "Left":
             SpaceShipList[spceshipindex].MoveLeft()
-        if KeyPressType == "Right" :
+        if KeyPressType == "Right":
             SpaceShipList[spceshipindex].MoveRight()
-    if BulletFire and bullety > 0 :
+    if BulletFire and bullety > 0:
         bullety -= 20
         SpaceShipList[spceshipindex].Bullets(Level1Bullet, bulletx, bullety)
-    else :
+    else:
         BulletFire = False
 
     # Check Results
