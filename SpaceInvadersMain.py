@@ -3,10 +3,12 @@ import pygame
 
 pygame.init()
 isRunning = True
-height = 800
-width = 600
+#height = 800
+#width = 600
 # screenres = (800,600)
-screen = pygame.display.set_mode((height, width))
+infoObject = pygame.display.Info()
+screen = pygame.display.set_mode((infoObject.current_w, infoObject.current_h))
+#screen = pygame.display.set_mode((height, width))
 pygame.display.set_caption("Space Invaders")
 icon = pygame.image.load("SpaceShip3.png")
 background = pygame.image.load("Bg.png")
