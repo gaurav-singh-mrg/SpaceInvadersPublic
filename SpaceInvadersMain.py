@@ -7,6 +7,8 @@ isRunning = True
 #width = 600
 # screenres = (800,600)
 infoObject = pygame.display.Info()
+height=infoObject.current_w
+width=infoObject.current_h
 screen = pygame.display.set_mode((infoObject.current_w, infoObject.current_h))
 #screen = pygame.display.set_mode((height, width))
 pygame.display.set_caption("Space Invaders")
