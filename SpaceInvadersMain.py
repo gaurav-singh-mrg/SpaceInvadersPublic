@@ -323,7 +323,7 @@ def OnStart2Play():
 
 
 def GetKeyboardBtn():
-
+    pass
 
 ScreenNumber = 1
 menuitm = 1
