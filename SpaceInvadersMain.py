@@ -19,6 +19,8 @@ pygame.display.set_icon(icon)
 # Initial SpaceShip Location
 global LocX
 global LocY
+LocX = 600
+LocY = 530
 KeyPress = False
 KeyPressType = None
 BulletFire = False
@@ -126,10 +128,9 @@ class SpaceShip:
         if self.y > 530:
             self.y = 530
 
-    def Bullets(self, name, a, b, type='Spaceship'):
+    def Bullets(self, name, a, b):
         global score
         self.name = name
-        self.type = type
         global BulletFire
         screen.blit(self.name, (a, b))
         for obj in EnemyList:
@@ -146,12 +147,13 @@ class SpaceShip:
 
 class Enemy(SpaceShip):
     def __init__(self, Name= None, ImageName=Level1Bullet, Angle=90, Pos=((int(height - 100)), int(width - 200)),
-                 AutoRotation=False):
+                 AutoRotation=False, Head = 'UP'):
         super().__init__(Name)
         self.ImageName = ImageName
         self.Angle = Angle
         self.Pos = Pos
         self.AutoRotation = AutoRotation
+        self.Head = Head
 
     def Rotation(self ,angle):
         OriginalPos = self.Pos
@@ -166,9 +168,21 @@ class Enemy(SpaceShip):
         image_rect = image1.get_rect(center=image_rect.center)
         screen.blit(image1, image_rect)
 
+    def EnemyBullets(self, a=0, b=0):
+        self.a = a
+        self.b = b
+        if (self.Head == 'UP'):
+            pass
+        elif (self.Head == 'Down'):
+            pass
+        elif(self.Head == 'LEFT'):
+            pass
+        elif(self.Head == 'RIGHT'):
+            pass
 
-LocX = 600
-LocY = 530
+
+
+
 
 # Name, Damage = 5, Rotate = False, Speed = 1, Teleportation = None, x = 0, y = 0
 
@@ -256,38 +270,37 @@ menuitm = 1
 GenerateEnemyBulk(0, 5)
 RotatedImage = Enemy()
 Angle = 0
+
+
+def Start():
+    RotatedImage.Rotation(Angle)
+    if menuitm == 1:
+        screen.blit(PlayC, (100, 100))
+    else:
+        screen.blit(Play, (100, 100))
+    if menuitm == 2:
+        screen.blit(SettingsC, (100, 200))
+    else:
+        screen.blit(Settings, (100, 200))
+    if menuitm == 3:
+        screen.blit(AboutC, (100, 300))
+    else:
+        screen.blit(About, (100, 300))
+    if menuitm == 4:
+        pass
+        # screen.blit(ResumeC, (100, 400))
+    else:
+        pass
+        # screen.blit(Resume, (100, 400))
+
+
 while isRunning:
     if i >= len(EnemyList):
         i = 0
     screen.fill((100, 0, 0))
     screen.blit(background, (0, 0))
     if ScreenNumber == 1:
-        Angle = Angle % 360
-        Angle+=5
-        RotatedImage.Rotation(Angle)
-        image = pygame.transform.rotate(Level1SpaceShip, angle)
-        image_rect = image.get_rect(center=image_rect.center)
-        screen.blit(image, image_rect)
-        angle += 1
-        if menuitm == 1:
-            screen.blit(PlayC, (100, 100))
-        else:
-            screen.blit(Play, (100, 100))
-        if menuitm == 2:
-            screen.blit(SettingsC, (100, 200))
-        else:
-            screen.blit(Settings, (100, 200))
-        if menuitm == 3:
-            screen.blit(AboutC, (100, 300))
-        else:
-            screen.blit(About, (100, 300))
-        if menuitm == 4:
-            pass
-            # screen.blit(ResumeC, (100, 400))
-        else:
-            pass
-            # screen.blit(Resume, (100, 400))
-
+        Start()
     if ScreenNumber == 2:
         SpaceShipList[spceshipindex].Draw()
         OnScreenText()
