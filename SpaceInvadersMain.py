@@ -11,11 +11,14 @@ isRunning = True
 infoObject = pygame.display.Info()
 height=infoObject.current_w
 width=infoObject.current_h
+xaxis = infoObject.current_w
+yaxis = infoObject.current_h
 screen = pygame.display.set_mode((infoObject.current_w, infoObject.current_h))
 #screen = pygame.display.set_mode((height, width))
 pygame.display.set_caption("Space Invaders")
 icon = pygame.image.load("SpaceShip3.png")
 background = pygame.image.load("Bg.png")
+background = pygame.transform.scale(background, (xaxis,yaxis))
 pygame.display.set_icon(icon)
 
 # Initial SpaceShip Location
@@ -70,20 +73,10 @@ score = 0
 angle = 0
 
 
-class RotateImage:
-    def __init__(self, Name, X, Y, Angle):
-        self.Name = Name
-        self.Pos = (X, Y)
-        pos = (500, 200)
-        screen_rect = Level1SpaceShip.get_rect()
-        screen_rect.center = pos
-        image = Level1SpaceShip.copy()
-        image_rect = Level1SpaceShip.get_rect(center=screen_rect.center)
-
 
 class SpaceShip:
     def __init__(self, Name, Damage=5, FireModeAuto=True, Rotate=False, Speed=10,
-                 Teleportation=False, x=0, y=0, EnemyMoveRight=True, MoveLeftRight=False, MoveUpDown=False):
+                 Teleportation=False, x=0, y=0, EnemyMoveRight=True, MoveLeftRight=False, MoveUpDown=False, ShowBullet=False):
         self.MoveUpDown = MoveUpDown
         self.MoveLeftRight = MoveLeftRight
         self.Name = Name
@@ -95,6 +88,7 @@ class SpaceShip:
         self.Teleportation = Teleportation
         self.x = x
         self.y = y
+        self.ShowBullet = ShowBullet
 
     def telePortation(self):
         if self.Teleportation:
@@ -149,13 +143,13 @@ class SpaceShip:
 
 class Enemy(SpaceShip):
     def __init__(self, Name= None, ImageName=Level1Bullet, Angle=90, Pos=((int(height - 100)), int(width - 200)),
-                 AutoRotation=False, Head = 'UP'):
+                 AutoRotation=False):
         super().__init__(Name)
         self.ImageName = ImageName
         self.Angle = Angle
         self.Pos = Pos
         self.AutoRotation = AutoRotation
-        self.Head = Head
+
 
     def Rotation(self ,angle):
         OriginalPos = self.Pos
@@ -179,18 +173,22 @@ class Enemy(SpaceShip):
         screen.blit(self.name, (x, y))
         self.a = self.a+1
 #        SpaceShip.Bullets(Level1Bullet)
+        #print(random.randrange(20, 50, 3))
 
 
-
-        if (self.Head == 'UP'):
-            pass
-        elif (self.Head == 'Down'):
-            pass
-        elif(self.Head == 'LEFT'):
-            pass
-        elif(self.Head == 'RIGHT'):
-            pass
-
+    def Movement(self):
+        if obj.MoveLeftRight:
+            if obj.x < 740 and obj.EnemyMoveRight is True:
+                obj.x += 1
+            elif obj.x == 740:
+                obj.y += 10
+                obj.x = 739
+                obj.EnemyMoveRight = False
+            elif obj.x > 0 and obj.EnemyMoveRight is False:
+                obj.x -= 1
+            elif obj.x <= 0:
+                obj.y += 10
+                obj.EnemyMoveRight = True
 
 
 
@@ -232,17 +230,17 @@ def GenerateEnemyBulk(level=0, number=5):
         for i in range(number):
             EnemyList.append(
                 SpaceShip(Name=Level4Enemy, MoveLeftRight=True, MoveUpDown=True, Damage=4 * Multiplier, Speed=20,
-                          x=random.randint(0, 740),
-                          y=random.randint(0, 290)))
+                          x=random.randint(0, xaxis),
+                          y=random.randint(0, yaxis)))
 
 
-SpaceShipList = [(SpaceShip(Name=Level1SpaceShip, Damage=5, x=LocX, y=LocY)),
-                 (SpaceShip(Name=Level2SpaceShip, Damage=5, x=LocX, y=LocY)),
-                 (SpaceShip(Name=Level3SpaceShip, Damage=5, x=LocX, y=LocY)),
-                 (SpaceShip(Name=Level4SpaceShip, Damage=5, x=LocX, y=LocY)),
-                 (SpaceShip(Name=Level5SpaceShip, Damage=5, x=LocX, y=LocY)),
-                 (SpaceShip(Name=Level6SpaceShip, Damage=5, x=LocX, y=LocY)),
-                 (SpaceShip(Name=Level7SpaceShip, Damage=5, x=LocX, y=LocY))]
+SpaceShipList = [(SpaceShip(Name=Level1SpaceShip, Damage=5, x=random.randrange(0, xaxis, 30), y=0)),
+                 (SpaceShip(Name=Level2SpaceShip, Damage=5, x=random.randrange(0, xaxis, 30), y=0)),
+                 (SpaceShip(Name=Level3SpaceShip, Damage=5, x=random.randrange(0, xaxis, 30), y=0)),
+                 (SpaceShip(Name=Level4SpaceShip, Damage=5, x=random.randrange(0, xaxis, 30), y=0)),
+                 (SpaceShip(Name=Level5SpaceShip, Damage=5, x=random.randrange(0, xaxis, 30), y=0)),
+                 (SpaceShip(Name=Level6SpaceShip, Damage=5, x=random.randrange(0, xaxis, 30), y=0)),
+                 (SpaceShip(Name=Level7SpaceShip, Damage=5, x=random.randrange(0, xaxis, 30), y=0))]
 move = 1
 i = 0
 spceshipindex = 0
@@ -251,12 +249,6 @@ green = (0, 255, 0)
 blue = (0, 0, 128)
 font = pygame.font.Font('freesansbold.ttf', 32)
 MoveCross = True
-# rotate Image
-pos = ((int(height - 100)), int(width - 200))
-screen_rect = Level1SpaceShip.get_rect()
-screen_rect.center = pos
-image = Level1SpaceShip.copy()
-image_rect = Level1SpaceShip.get_rect(center=screen_rect.center)
 
 
 def OnScreenText():
