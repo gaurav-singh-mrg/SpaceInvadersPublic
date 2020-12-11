@@ -13,6 +13,8 @@ height=infoObject.current_w
 width=infoObject.current_h
 xaxis = infoObject.current_w
 yaxis = infoObject.current_h
+print("x",xaxis)
+print("y",yaxis)
 screen = pygame.display.set_mode((infoObject.current_w, infoObject.current_h))
 #screen = pygame.display.set_mode((height, width))
 pygame.display.set_caption("Space Invaders")
@@ -103,8 +105,8 @@ class SpaceShip:
 
     def MoveRight(self):
         self.x += self.Speed
-        if self.x > 730:
-            self.x = 730
+        if self.x > xaxis-64:
+            self.x = xaxis-64
 
     def MoveLeft(self):
         self.x -= self.Speed
@@ -121,8 +123,8 @@ class SpaceShip:
     def MoveDown(self):
         self.y += self.Speed
         print(self.y)
-        if self.y > 530:
-            self.y = 530
+        if self.y > yaxis-64:
+            self.y = yaxis-64
 
     def Bullets(self, name = Level1Bullet , a = 0, b = 0 ):
         global score
@@ -213,25 +215,25 @@ EnemyList = []
 def GenerateEnemyBulk(level=0, number=5):
     if level == 0:
         for i in range(number):
-            EnemyList.append(SpaceShip(Name=Level1Enemy, Damage=1 * Multiplier, Speed=5, x=random.randint(0, 740),
-                                       y=random.randint(0, 290)))
+            EnemyList.append(SpaceShip(Name=Level1Enemy, Damage=1 * Multiplier, Speed=5, x=random.randrange(0, xaxis, 30),
+                                       y=random.randrange(0, yaxis, 30)))
     if level == 1:
         for i in range(number):
             EnemyList.append(SpaceShip(Name=Level2Enemy, MoveLeftRight=True, Damage=2 * Multiplier, Speed=10,
-                                       x=random.randint(0, 740),
-                                       y=random.randint(0, 290)))
+                                       x=random.randrange(0, xaxis, 30),
+                                       y=random.randrange(0, yaxis, 30)))
     if level == 2:
         for i in range(number):
             EnemyList.append(
-                SpaceShip(Name=Level3Enemy, Damage=3 * Multiplier, MoveUpDown=True, Speed=15, x=random.randint(0, 740),
-                          y=random.randint(0, 290)))
+                SpaceShip(Name=Level3Enemy, Damage=3 * Multiplier, MoveUpDown=True, Speed=15, x=random.randrange(0, xaxis, 30),
+                          y=random.randrange(0, yaxis, 30)))
 
     if level == 3:
         for i in range(number):
             EnemyList.append(
                 SpaceShip(Name=Level4Enemy, MoveLeftRight=True, MoveUpDown=True, Damage=4 * Multiplier, Speed=20,
-                          x=random.randint(0, xaxis),
-                          y=random.randint(0, yaxis)))
+                          x=random.randrange(0, xaxis, 30),
+                          y=random.randrange(0, yaxis, 30)))
 
 
 SpaceShipList = [(SpaceShip(Name=Level1SpaceShip, Damage=5, x=random.randrange(0, xaxis, 30), y=0)),
@@ -264,7 +266,7 @@ def OnScreenText():
     # Bullet Text
     BulletText = font.render('Bullet: ', True, green)
     BulletTextRect = BulletText.get_rect()
-    BulletTextRect.center = (700, 20)
+    BulletTextRect.center = (xaxis-60, 60)
     screen.blit(BulletText, BulletTextRect)
 
 
