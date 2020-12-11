@@ -1,4 +1,6 @@
 import random
+from math import tan
+
 import pygame
 
 pygame.init()
@@ -128,7 +130,7 @@ class SpaceShip:
         if self.y > 530:
             self.y = 530
 
-    def Bullets(self, name, a, b):
+    def Bullets(self, name = Level1Bullet , a = 0, b = 0 ):
         global score
         self.name = name
         global BulletFire
@@ -171,6 +173,15 @@ class Enemy(SpaceShip):
     def EnemyBullets(self, a=0, b=0):
         self.a = a
         self.b = b
+        m = tan(self.Angle)
+        x = self.a
+        y = m*x
+        screen.blit(self.name, (x, y))
+        self.a = self.a+1
+#        SpaceShip.Bullets(Level1Bullet)
+
+
+
         if (self.Head == 'UP'):
             pass
         elif (self.Head == 'Down'):
