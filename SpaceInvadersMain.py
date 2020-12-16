@@ -11,8 +11,8 @@ isRunning = True
 infoObject = pygame.display.Info()
 height=infoObject.current_w
 width=infoObject.current_h
-xaxis = infoObject.current_w
-yaxis = infoObject.current_h
+xaxis = infoObject.current_w - 64
+yaxis = infoObject.current_h -64
 print("x",xaxis)
 print("y",yaxis)
 screen = pygame.display.set_mode((infoObject.current_w, infoObject.current_h))
@@ -20,14 +20,10 @@ screen = pygame.display.set_mode((infoObject.current_w, infoObject.current_h))
 pygame.display.set_caption("Space Invaders")
 icon = pygame.image.load("SpaceShip3.png")
 background = pygame.image.load("Bg.png")
-background = pygame.transform.scale(background, (xaxis,yaxis))
+background = pygame.transform.scale(background, (infoObject.current_w,infoObject.current_h))
 pygame.display.set_icon(icon)
 
 # Initial SpaceShip Location
-global LocX
-global LocY
-LocX = 600
-LocY = 530
 KeyPress = False
 KeyPressType = None
 BulletFire = False
@@ -72,13 +68,13 @@ ResumeC = pygame.image.load("ResumeC.png")
 
 # Player Score
 score = 0
-angle = 0
 
 
 
 class SpaceShip:
     def __init__(self, Name, Damage=5, FireModeAuto=True, Rotate=False, Speed=10,
-                 Teleportation=False, x=0, y=0, EnemyMoveRight=True, MoveLeftRight=False, MoveUpDown=False, ShowBullet=False):
+                 Teleportation=False, x=0, y=0, EnemyMoveRight=True, MoveLeftRight=False, MoveUpDown=False,
+                 ShowBullet=False, Angle=90, BulletName=Level1Bullet, FireName=Level1Fire,BulletX=0,BulletY=0):
         self.MoveUpDown = MoveUpDown
         self.MoveLeftRight = MoveLeftRight
         self.Name = Name
@@ -91,22 +87,25 @@ class SpaceShip:
         self.x = x
         self.y = y
         self.ShowBullet = ShowBullet
+        self.Angle = Angle
+        self.BulletName = BulletName
+        self.FireName = FireName
+        self.BulletX = BulletX
+        self.BulletY = BulletY
 
     def telePortation(self):
         if self.Teleportation:
-            self.x = random.randint(0, 740)
-            self.y = random.randint(0, 290)
+            self.x = random.randint(0, xaxis)
+            self.y = random.randint(0, yaxis)
 
     def Draw(self):
         screen.blit(self.Name, (self.x, self.y))
 
-    def AutoMove(self):
-        pass
 
     def MoveRight(self):
         self.x += self.Speed
-        if self.x > xaxis-64:
-            self.x = xaxis-64
+        if self.x > xaxis:
+            self.x = xaxis
 
     def MoveLeft(self):
         self.x -= self.Speed
@@ -123,24 +122,38 @@ class SpaceShip:
     def MoveDown(self):
         self.y += self.Speed
         print(self.y)
-        if self.y > yaxis-64:
-            self.y = yaxis-64
+        if self.y > yaxis:
+            self.y = yaxis
 
-    def Bullets(self, name = Level1Bullet , a = 0, b = 0 ):
+    def Bullets(self):
         global score
-        self.name = name
         global BulletFire
-        screen.blit(self.name, (a, b))
+        screen.blit(self.BulletName, (self.BulletX, self.BulletY))
         for obj in EnemyList:
-            if obj.x - 26 < a < obj.x + 26 and obj.y - 26 <= b <= obj.y + 26:
+            if obj.x - 26 < self.BulletX < obj.x + 26 and obj.y - 26 <= self.BulletY <= obj.y + 26:
                 obj.Damage -= 1
                 BulletFire = False
-                screen.blit(Level1Fire, (a, b))
-                # pygame.time.wait(130)
+                screen.blit(self.FireName, (self.BulletX, self.BulletY))
                 if obj.Damage == 0:
                     score += 1
-                    screen.blit(Level1Fire, (a, b))
+                    screen.blit(self.FireName, (self.BulletX, self.BulletY))
                     EnemyList.remove(obj)
+
+
+    def Rotation(self):
+        OriginalPos = self.Pos
+        # pos = ((int(height - 100)), int(width - 200))
+        #image1 = pygame.image.load("SpaceShip6.png")
+        image1 = self.Name
+        #image = self.ImageName
+        screen_rect = image1.get_rect()
+        screen_rect.center = OriginalPos
+        image = image1.copy()
+        image_rect = image1.get_rect(center=screen_rect.center)
+        image1 = pygame.transform.rotate(image1, self.Angle)
+        image_rect = image1.get_rect(center=image_rect.center)
+        screen.blit(image1, image_rect)
+
 
 
 class Enemy(SpaceShip):
@@ -169,28 +182,28 @@ class Enemy(SpaceShip):
     def EnemyBullets(self, a=0, b=0):
         self.a = a
         self.b = b
-        m = tan(self.Angle)
+        m = int(tan(self.Angle))
         x = self.a
-        y = m*x
-        screen.blit(self.name, (x, y))
-        self.a = self.a+1
+        y = int(m*x)
+        screen.blit(self.BulletName, (x, y))
+        self.a = self.a+10
 #        SpaceShip.Bullets(Level1Bullet)
         #print(random.randrange(20, 50, 3))
 
 
     def Movement(self):
-        if obj.MoveLeftRight:
-            if obj.x < 740 and obj.EnemyMoveRight is True:
-                obj.x += 1
-            elif obj.x == 740:
-                obj.y += 10
-                obj.x = 739
-                obj.EnemyMoveRight = False
-            elif obj.x > 0 and obj.EnemyMoveRight is False:
-                obj.x -= 1
-            elif obj.x <= 0:
-                obj.y += 10
-                obj.EnemyMoveRight = True
+        if self.MoveLeftRight:
+            if self.x < xaxis and self.EnemyMoveRight is True:
+                self.x += 1
+            elif self.x == xaxis:
+                self.y += 10
+                self.x = xaxis
+                self.EnemyMoveRight = False
+            elif self.x > 0 and self.EnemyMoveRight is False:
+                self.x -= 1
+            elif self.x <= 0:
+                self.y += 10
+                self.EnemyMoveRight = True
 
 
 
@@ -215,7 +228,7 @@ EnemyList = []
 def GenerateEnemyBulk(level=0, number=5):
     if level == 0:
         for i in range(number):
-            EnemyList.append(SpaceShip(Name=Level1Enemy, Damage=1 * Multiplier, Speed=5, x=random.randrange(0, xaxis, 30),
+            EnemyList.append(SpaceShip(Name=Level1Enemy, ShowBullet=True,Damage=1 * Multiplier, Speed=5, x=random.randrange(0, xaxis, 30),
                                        y=random.randrange(0, yaxis, 30)))
     if level == 1:
         for i in range(number):
@@ -236,7 +249,7 @@ def GenerateEnemyBulk(level=0, number=5):
                           y=random.randrange(0, yaxis, 30)))
 
 
-SpaceShipList = [(SpaceShip(Name=Level1SpaceShip, Damage=5, x=random.randrange(0, xaxis, 30), y=0)),
+SpaceShipList = [(SpaceShip(Name=Level1SpaceShip, Damage=5, x=yaxis, y=random.randrange(0, xaxis, 30))),
                  (SpaceShip(Name=Level2SpaceShip, Damage=5, x=random.randrange(0, xaxis, 30), y=0)),
                  (SpaceShip(Name=Level3SpaceShip, Damage=5, x=random.randrange(0, xaxis, 30), y=0)),
                  (SpaceShip(Name=Level4SpaceShip, Damage=5, x=random.randrange(0, xaxis, 30), y=0)),
@@ -309,22 +322,28 @@ while isRunning:
     if ScreenNumber == 2:
         SpaceShipList[spceshipindex].Draw()
         OnScreenText()
+        RotatedImage.Rotation(Angle)
+        RotatedImage.Movement()
 
         # generateEnemy()
         if len(EnemyList) == 0:
             Level += 1
             if Level == 0:
                 GenerateEnemyBulk(0, 5)
-            if Level == 1:
+            elif Level == 1:
                 GenerateEnemyBulk(1, 4)
-            if Level == 2:
+            elif Level == 2:
                 GenerateEnemyBulk(2, 3)
-            if Level == 3:
+            elif Level == 3:
                 GenerateEnemyBulk(3, 2)
+            else:
+                isRunning = False
 
         for obj in EnemyList:
             # obj.telePortation()
             obj.Draw()
+            obj.BulletX = obj.x
+            obj.BulletY = obj.y
             if obj.MoveLeftRight:
                 if obj.x < 740 and obj.EnemyMoveRight is True:
                     obj.x += 1
@@ -349,8 +368,13 @@ while isRunning:
                 elif obj.y <= 0:
                     obj.x += 10
                     obj.EnemyMoveRight = True
-            if MoveCross:
-                pass
+            if obj.ShowBullet:
+                if obj.BulletY > 0:
+                    m = int(tan(obj.Angle))
+                    obj.BulletY = obj.BulletX * m
+                    obj.BulletX -= 100
+                    screen.blit(obj.BulletName, (obj.BulletX, obj.BulletY))
+                    #obj.Bullets()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -414,11 +438,11 @@ while isRunning:
                 elif ScreenNumber == 2:
                     ScreenNumber == 1
             if event.key == pygame.K_SPACE and not BulletFire:
+                SpaceShipList[spceshipindex].BulletX = SpaceShipList[spceshipindex].x
+                SpaceShipList[spceshipindex].BulletY = SpaceShipList[spceshipindex].y
                 KeyPressType = "Bullet"
-                bulletx = SpaceShipList[spceshipindex].x
-                bullety = SpaceShipList[spceshipindex].y
                 BulletFire = True
-                SpaceShipList[spceshipindex].Bullets(Level1Bullet, bulletx, bullety)
+                SpaceShipList[spceshipindex].Bullets()
 
             KeyPress = True
         if event.type == pygame.KEYUP:
@@ -437,9 +461,11 @@ while isRunning:
             SpaceShipList[spceshipindex].MoveLeft()
         if KeyPressType == "Right":
             SpaceShipList[spceshipindex].MoveRight()
-    if BulletFire and bullety > 0:
-        bullety -= 20
-        SpaceShipList[spceshipindex].Bullets(Level1Bullet, bulletx, bullety)
+    if BulletFire and SpaceShipList[spceshipindex].BulletY > 0:
+        m = int(tan(SpaceShipList[spceshipindex].Angle))
+        #SpaceShipList[spceshipindex].BulletX = SpaceShipList[spceshipindex].BulletX * m
+        SpaceShipList[spceshipindex].BulletY -= 10
+        SpaceShipList[spceshipindex].Bullets()
     else:
         BulletFire = False
 
